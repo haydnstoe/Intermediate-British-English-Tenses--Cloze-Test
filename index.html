@@ -1,22 +1,185 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>Interactive Quiz</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Intermediate Level English Tenses</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; line-height:1.5; margin:24px; color:#111; background:#f7f9fb; }
+    h1 { font-size:1.6rem; margin-bottom:0.2rem; }
+    h3 { margin-top:1.2rem; margin-bottom:0.4rem; }
+    .instructions { background:#fff; border:1px solid #e1e6ea; padding:12px; border-radius:8px; max-width:900px; }
+    .quiz { margin-top:16px; max-width:900px; }
+    .q { background:#fff; border:1px solid #e1e6ea; padding:12px; border-radius:8px; margin-bottom:10px; }
+    .sentence { margin-bottom:8px; }
+    .options { display:flex; flex-wrap:wrap; gap:8px; }
+    .option { flex:1 1 48%; min-width:160px; }
+    button { background:#0b6efd; color:#fff; border:none; padding:10px 14px; border-radius:6px; cursor:pointer; font-weight:600; }
+    button.secondary { background:#6c757d; margin-left:8px; }
+    .result { margin-top:12px; padding:10px; border-radius:8px; }
+    .correct { background:#e6ffed; border:1px solid #b7f0c9; color:#0b6b2f; }
+    .incorrect { background:#fff0f0; border:1px solid #f2c2c2; color:#8a1b1b; }
+    .reveal { margin-top:8px; font-size:0.95rem; color:#333; }
+    small { color:#555; }
+    footer { margin-top:18px; font-size:0.9rem; color:#444; }
+    @media (max-width:600px){ .option{ flex-basis:100%; } }
+  </style>
 </head>
 <body>
-  <h1>HTML Basics Quiz</h1>
-  <form id="quiz-form">
-    <div>
-      <p>1. What does HTML stand for?</p>
-      <input type="radio" name="q1" value="a"> Home Tool Markup Language<br>
-      <input type="radio" name="q1" value="b"> HyperText Markup Language<br>
-      <input type="radio" name="q1" value="c"> Hyperlink Text Management Language<br>
+  <main>
+    <h1>Intermediate Level English Tenses (20 questions)</h1>
+    <div class="instructions">
+      <p><strong>Task</strong> — Complete each sentence by choosing the correct verb form.</p>
+      <p><strong>How to use</strong> — Select one answer per question, then click <em>Check answers</em>. Your score and the correct forms will be shown. Use <em>Reset</em> to try again.</p>
+      <p><small>Note: British English spellings and usages are used where relevant.</small></p>
     </div>
-    <button type="button" onclick="submitQuiz()">Submit</button>
-  </form>
-  <div id="result"></div>
 
-  <script src="script.js"></script>
+    <section class="quiz" id="quiz">
+      <!-- Questions will be injected here by JavaScript -->
+    </section>
+
+    <div style="margin-top:12px;">
+      <button id="check">Check answers</button>
+      <button id="reset" class="secondary">Reset</button>
+      <div id="score" class="result" style="display:none;"></div>
+    </div>
+
+    <footer>
+</small></small>
+    </footer>
+  </main>
+
+  <script>
+    // Question bank: sentence with a blank, correct answer, and distractors.
+    // All verb forms use British English conventions where applicable.
+    const questions = [
+      { id:1, sentence: "Every morning she ____ a cup of tea before work.", correct: "drinks", distractors:["is drinking","has drunk","was drinking"] },
+      { id:2, sentence: "At 9pm last night I ____ a film when the phone rang.", correct: "was watching", distractors:["watched","have watched","had watched"] },
+      { id:3, sentence: "They ____ in London since 2018.", correct: "have lived", distractors:["lived","are living","had lived"] },
+      { id:4, sentence: "By the time we arrived, the concert ____ .", correct: "had started", distractors:["has started","was starting","started"] },
+      { id:5, sentence: "Right now he ____ for his exams and can't come out.", correct: "is revising", distractors:["revises","has revised","revised"] },
+      { id:6, sentence: "I ____ to that song many times this week.", correct: "have listened", distractors:["listened","am listening","was listening"] },
+      { id:7, sentence: "Tomorrow at this time I ____ on a train to Edinburgh.", correct: "will be travelling", distractors:["travel","am travelling","have travelled"] },
+      { id:8, sentence: "She ____ three novels so far this year.", correct: "has written", distractors:["wrote","is writing","had written"] },
+      { id:9, sentence: "When I was a child, we often ____ to the seaside.", correct: "went", distractors:["have gone","go","were going"] },
+      { id:10, sentence: "He usually ____ his bike to work, but today he ____ the bus.", correct: "rides;is taking", distractors:["is riding;takes","rode;took","has ridden;has taken"] },
+      { id:11, sentence: "They ____ for two hours before the teacher arrived.", correct: "had been waiting", distractors:["have been waiting","were waiting","waited"] },
+      { id:12, sentence: "I ____ the report by Friday; you can rely on me.", correct: "will have finished", distractors:["finish","am finishing","have finished"] },
+      { id:13, sentence: "Listen! The children ____ in the garden.", correct: "are playing", distractors:["play","have played","played"] },
+      { id:14, sentence: "She ____ to the manager about the problem yesterday.", correct: "spoke", distractors:["has spoken","was speaking","had spoken"] },
+      { id:15, sentence: "By next month he ____ here for ten years.", correct: "will have worked", distractors:["will work","has worked","is working"] },
+      { id:16, sentence: "I ____ him since we left school; we met last week.", correct: "hadn't seen", distractors:["haven't seen","don't see","wasn't seeing"] },
+      { id:17, sentence: "While I ____ dinner, the guests arrived.", correct: "was preparing", distractors:["prepared","have prepared","had prepared"] },
+      { id:18, sentence: "She ____ French for five years and speaks it well.", correct: "has been learning", distractors:["learns","is learning","learned"] },
+      { id:19, sentence: "If you phone now, I ____ you in five minutes.", correct: "will call", distractors:["am calling","would call","have called"] },
+      { id:20, sentence: "They ____ the house by the time the inspectors came.", correct: "had cleaned", distractors:["have cleaned","cleaned","were cleaning"] }
+    ];
+
+    // Utility: shuffle array in-place (Fisher-Yates)
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Build the quiz HTML with shuffled options for each question
+    function buildQuiz() {
+      const container = document.getElementById('quiz');
+      container.innerHTML = '';
+      questions.forEach((q, idx) => {
+        // Prepare options array and shuffle
+        const opts = [q.correct, ...q.distractors].slice(0,4); // ensure 4 options
+        shuffle(opts);
+
+        // Create question element
+        const qDiv = document.createElement('div');
+        qDiv.className = 'q';
+        qDiv.dataset.qid = q.id;
+
+        const sent = document.createElement('div');
+        sent.className = 'sentence';
+        sent.innerHTML = `<strong>Q${idx+1}.</strong> ${q.sentence.replace('____', '<em>____</em>')}`;
+        qDiv.appendChild(sent);
+
+        const optsDiv = document.createElement('div');
+        optsDiv.className = 'options';
+
+        opts.forEach((opt, i) => {
+          const label = document.createElement('label');
+          label.className = 'option';
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'q' + q.id;
+          input.value = opt;
+          input.style.marginRight = '8px';
+          label.appendChild(input);
+          // Show options as plain text; keep punctuation and semicolons as in Q10
+          label.appendChild(document.createTextNode(opt));
+          optsDiv.appendChild(label);
+        });
+
+        // Store correct answer on element for checking
+        qDiv.dataset.correct = q.correct;
+        qDiv.appendChild(optsDiv);
+
+        // Placeholder for feedback
+        const feedback = document.createElement('div');
+        feedback.className = 'reveal';
+        feedback.style.display = 'none';
+        qDiv.appendChild(feedback);
+
+        container.appendChild(qDiv);
+      });
+    }
+
+    // Check answers and show results
+    function checkAnswers() {
+      let correctCount = 0;
+      const total = questions.length;
+      questions.forEach((q) => {
+        const qDiv = document.querySelector(`.q[data-qid="${q.id}"]`);
+        const chosen = qDiv.querySelector('input[type="radio"]:checked');
+        const feedback = qDiv.querySelector('.reveal');
+        feedback.style.display = 'block';
+        // Format correct answer display
+        const correctText = q.correct;
+        if (chosen && chosen.value === q.correct) {
+          correctCount++;
+          qDiv.classList.remove('incorrect');
+          qDiv.classList.add('correct');
+          feedback.textContent = 'Correct.';
+        } else {
+          qDiv.classList.remove('correct');
+          qDiv.classList.add('incorrect');
+          const chosenText = chosen ? chosen.value : 'No answer';
+          feedback.innerHTML = `Your answer: <strong>${chosenText}</strong>. Correct answer: <strong>${correctText}</strong>.`;
+        }
+      });
+
+      const scoreDiv = document.getElementById('score');
+      scoreDiv.style.display = 'block';
+      scoreDiv.className = 'result';
+      const percent = Math.round((correctCount / total) * 100);
+      scoreDiv.innerHTML = `<strong>Score:</strong> ${correctCount} / ${total} (${percent}%)`;
+      if (percent === 100) scoreDiv.classList.add('correct');
+      else if (percent >= 70) scoreDiv.classList.add('correct');
+      else scoreDiv.classList.add('incorrect');
+    }
+
+    // Reset the quiz (reshuffle options and clear selections)
+    function resetQuiz() {
+      buildQuiz();
+      const scoreDiv = document.getElementById('score');
+      scoreDiv.style.display = 'none';
+    }
+
+    // Initialise
+    buildQuiz();
+
+    document.getElementById('check').addEventListener('click', checkAnswers);
+    document.getElementById('reset').addEventListener('click', resetQuiz);
+  </script>
 </body>
 </html>
